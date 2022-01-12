@@ -1,6 +1,5 @@
 $(document).ready(function(){
     function requestApi(pokemon) {
-        var respuesta
         $.ajax({
             url: pokemon,
             context: document.body,
@@ -19,7 +18,43 @@ $(document).ready(function(){
                   $('#info').append(details)
                   n = n + 1
                 })
+                //actuliza url btn quiero ver mas pokemones
                 next_url = response.next
+                // agregar a cada btn !quiero ver mas de este pokemon! la funcion para actualizar y levantar modal
+                $('.pokemodal').click(function(e){
+                    e.preventDefault();
+                    let new_url = ($(this).attr('url'))
+                    $.ajax({
+                        url: new_url,
+                        context: document.body,
+                        method: 'GET',
+                        beforeSend: function(){
+                            $('.erase-before-send').empty()
+                        },
+                        success: function(response){
+                            var pokeImage = response.sprites.front_default
+                            var pokeImageBack = response.sprites.back_default
+                            $("#pokeImage").attr("src", pokeImage)
+                            $("#pokeImageBack").attr("src", pokeImageBack)
+                            $('#url-pokemon-modal').html((response.species.name.charAt(0).toUpperCase() + response.species.name.substr(1).toLowerCase()))
+                            response.abilities.forEach(function(abi){ 
+                                $("#abilityPokemon").append("<p class='list-ability'>"+abi.ability.name.charAt(0).toUpperCase()+abi.ability.name.substr(1).toLowerCase()+"</p>")
+                            })
+                            response.types.forEach(function(tipo){
+                                $("#typePokemon").append("<p>"+tipo.type.name.charAt(0).toUpperCase()+tipo.type.name.substr(1).toLowerCase()+"</p>")
+                            })
+                            response.moves.forEach(function(move, index){
+                                if (index < 5) {
+                                    $("#movePokemon").append("<p>"+move.move.name.charAt(0).toUpperCase()+move.move.name.substr(1).toLowerCase()+"</p>")
+                                }
+                            })
+                            response.game_indices.forEach(function(index){
+                                $("#generationPokemon").append("<p>"+index.version.name.charAt(0).toUpperCase()+index.version.name.substr(1).toLowerCase()+"</p>")
+                            })
+                        }
+                    })
+                    $('#myModal').modal('show')
+                })
             }
         })
     }
@@ -34,5 +69,5 @@ $(document).ready(function(){
         })
     }
     activeButton()
-
+    
  })
